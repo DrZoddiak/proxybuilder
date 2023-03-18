@@ -3,6 +3,36 @@ body {
     font-family: sans-serif
 }
 .cardimg {
-    width:182px;
-    height:261px;
+    position : relative;
+    width: 182px;
+    height: 261px;
+    padding: 5px;
+}
+
+ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.caption {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+    transform: translate( 55%, 25% );
+    text-align: center;
+    color: white;
+    font-weight: bold;
+}
+
+.captionOff {
+    display: none;
+}
+
+.card:hover > .caption {
+    visibility: visible;
+}
+
+.card:hover > .cardimg {
+    opacity: .9
 }

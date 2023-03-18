@@ -40,6 +40,15 @@ fun main() {
             allowMethod(HttpMethod.Get)
             allowMethod(HttpMethod.Post)
             allowMethod(HttpMethod.Delete)
+            val targetSrc = "scryfall.com"
+            val embedSrc = "embed.$targetSrc"
+            headersOf(
+                "connect-src" to listOf("api.$targetSrc",embedSrc),
+                "img-src" to listOf("*.scryfall.io"),
+                "style-src" to listOf(embedSrc),
+                "script-src" to listOf(embedSrc),
+                "font-src" to listOf(embedSrc)
+            )
             anyHost()
         }
         install(Compression) {

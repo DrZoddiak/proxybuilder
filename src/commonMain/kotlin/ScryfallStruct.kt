@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BaseResponse(
+    @SerialName("total_cards")
+    val totalCards : Int,
     val data: List<CardData>
 )
 

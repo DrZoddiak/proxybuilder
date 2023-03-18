@@ -1,5 +1,4 @@
 
-import Api.addArtCard
 import Api.addFinalizedCard
 import Api.cardLookup
 import Api.deleteArtCards
@@ -7,14 +6,18 @@ import Api.deleteFinalizedCard
 import Api.deleteFinalizedCards
 import Api.getArtCardList
 import Api.getFinalizedCardList
+import Api.printsLookup
+import Api.reloadArtCards
 import Api.zipFiles
 import components.InputComponent
+import components.SliderComponent
 import csstype.ClassName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import react.*
 import react.dom.html.ReactHTML.a
 import react.dom.html.ReactHTML.button
+import react.dom.html.ReactHTML.div
 import react.dom.html.ReactHTML.h1
 import react.dom.html.ReactHTML.hr
 import react.dom.html.ReactHTML.i
@@ -62,33 +65,33 @@ val App = FC<Props> {
     }
     //Selected cards
     ul {
-        onContextMenu = {
-            it.preventDefault()
-        }
         deckList.forEach { deck ->
             key = deck.toString()
-            img {
-                className = ClassName("cardimg")
-                src = deck.imageUri
-                onClick = {
-                    scope.launch {
-                        deleteArtCards()
-
-                        cardLookup(deck.name).map { list ->
-                            list.map {
-                                ArtCard(it.id, it.name, it.imageUris!!.png)
-                            }
-                        }.forEach {
-                            addArtCard(it)
-                        }
-
-                        artList = getArtCardList()
+            div {
+                className = ClassName("card")
+                div {
+                    className = ClassName(if (deck.totalCards > 1) "caption" else "captionOff")
+                    i {
+                        className = ClassName("fa-solid fa-square-plus")
                     }
                 }
-                onAuxClick = {
-                    scope.launch {
-                        deleteFinalizedCard(deck)
-                        deckList = getFinalizedCardList()
+                img {
+                    className = ClassName("cardimg")
+                    src = deck.imageUri
+                    onClick = {
+                        scope.launch {
+                            reloadArtCards(deck.name)
+                            artList = getArtCardList()
+                        }
+                    }
+                    onAuxClick = {
+                        scope.launch {
+                            deleteFinalizedCard(deck)
+                            deckList = getFinalizedCardList()
+                        }
+                    }
+                    onContextMenu = {
+                        it.preventDefault()
                     }
                 }
             }
@@ -96,20 +99,34 @@ val App = FC<Props> {
     }
     hr()
     //Art Selection
+    SliderComponent {
+        handleToggle = {
+            scope.launch {
+                Api.uniqueSetting = it
+                if (artList.isNotEmpty()) {
+                    reloadArtCards(artList[0].name)
+                    artList = getArtCardList()
+                }
+            }
+        }
+    }
     ul {
         artList.forEach { artCard ->
             key = artCard.toString()
-            img {
-                className = ClassName("cardimg")
-                src = artCard.imageUri
-                onClick = {
-                    scope.launch {
-                        val oldCard = getFinalizedCardList().find { it.name == artCard.name }
-                        oldCard?.let { card -> deleteFinalizedCard(card) }
-                        addFinalizedCard(artCard.asFinalizedCard())
-                        deleteArtCards()
-                        artList = getArtCardList()
-                        deckList = getFinalizedCardList()
+            div {
+                className = ClassName("card")
+                img {
+                    className = ClassName("cardimg")
+                    src = artCard.imageUri
+                    onClick = {
+                        scope.launch {
+                            val oldCard = getFinalizedCardList().find { it.name == artCard.name }
+                            oldCard?.let { card -> deleteFinalizedCard(card) }
+                            addFinalizedCard(artCard.asFinalizedCard())
+                            deleteArtCards()
+                            artList = getArtCardList()
+                            deckList = getFinalizedCardList()
+                        }
                     }
                 }
             }
@@ -117,13 +134,17 @@ val App = FC<Props> {
 
     }
     hr()
-    //Input Form
+//Input Form
     InputComponent {
         onSubmit = { input ->
             scope.launch {
                 cardLookup(input)
+                    .map { it.data }
                     .map { it[0] }
-                    .map { FinalizedCard(it.id, it.name, it.imageUris!!.png) }
+                    .map {
+                        val cat = "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
+                        FinalizedCard(it.id, it.name, it.imageUris?.png ?: cat, printsLookup(it.printsSearchUri))
+                    }
                     .forEach {
                         addFinalizedCard(it)
                     }

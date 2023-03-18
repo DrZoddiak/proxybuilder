@@ -27,6 +27,8 @@ object Api {
         install(Logging)
     }
 
+    var uniqueSetting = false
+
     private suspend fun deleteCards(path: String) {
         jsonClient.delete(path)
     }
@@ -53,14 +55,27 @@ object Api {
     }
 
     private class Scrypics(private val client: HttpClient, private val url: String = "https://api.scryfall.com/cards") {
-        suspend fun fetch(input: String): List<CardData> {
-            delay(50)
-            return client.get("$url/search") {
+        suspend fun fetch(input: String): BaseResponse {
+            delay(50) //Suggested delay by api
+
+            val uniqueParam = if (uniqueSetting) "art" else "prints"
+
+            val search = client.get("$url/search") {
                 url {
-                    parameters.append("unique", "art")
+                    parameters.append("unique", uniqueParam)
                     parameters.append("q", """ "$input" """.trim())
                 }
-            }.body<BaseResponse>().data
+            }
+
+            if (search.status == HttpStatusCode.NotFound) {
+                return BaseResponse(-1, emptyList())
+            }
+
+            return search.body()
+        }
+
+        suspend fun fetchPrints(input: String): Int {
+            return client.get(input).body<BaseResponse>().totalCards
         }
     }
 
@@ -105,19 +120,41 @@ object Api {
         deleteCards(FinalizedCard.path + "/${finalizedCard.id}")
     }
 
-    suspend fun cardLookup(input: String): List<List<CardData>> {
+    suspend fun cardLookup(input: String): List<BaseResponse> {
+
         return input.split("\n")
             .filterNot { it.isEmpty() }
             .map { removeNumbers(it) }
             .map { ScrypicsApi.fetch(it) }
+            .filterNot { it.totalCards < 0 }
     }
 
-    suspend fun zipFiles(list : List<FinalizedCard>) {
+    suspend fun printsLookup(input: String) = ScrypicsApi.fetchPrints(input)
+
+    suspend fun reloadArtCards(card: String) {
+        deleteArtCards()
+
+        artCards(card).forEach {
+            addArtCard(it)
+        }
+    }
+
+    suspend fun artCards(card: String): List<List<ArtCard>> {
+        //produce Art Card
+        return cardLookup(card).map { resp ->
+            resp.data.map {
+                val cat = "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
+                ArtCard(it.id, it.name, it.imageUris?.png ?: cat, printsLookup(it.printsSearchUri))
+            }
+        }
+    }
+
+    suspend fun zipFiles(list: List<FinalizedCard>) {
         val zip = JSZip()
         val img = zip.folder("images")
-        list.forEach {card ->
+        list.forEach { card ->
             fetch(card.imageUri).then {
-                img?.file("${card.name}.png",it.blob())
+                img?.file("${card.name}.png", it.blob())
             }.await()
         }
         zip.generateAsync(generatorOptions("blob")).then { blob ->
