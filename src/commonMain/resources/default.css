@@ -36,3 +36,24 @@ ul {
 .card:hover > .cardimg {
     opacity: .9
 }
+
+.Modal {
+    position: absolute;
+    top: 20%;
+    left: 40px;
+    right: 40px;
+    bottom: auto;
+    background-color: papayawhip;
+}
+
+.Overlay {
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    background: rgba(0,0,0,0.9);
+}

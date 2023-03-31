@@ -63,18 +63,22 @@ kotlin {
                 implementation("org.litote.kmongo:kmongo-coroutine-serialization:$kmongoVersion")
             }
         }
-
         val jsMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-js:$ktorVersion")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-                implementation(project.dependencies.enforcedPlatform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom")
+                val wrappers = "org.jetbrains.kotlin-wrappers"
+                implementation(project.dependencies.enforcedPlatform("$wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
+                implementation("$wrappers:kotlin-react")
+                implementation("$wrappers:kotlin-react-dom")
+                implementation("$wrappers:kotlin-emotion")
+                implementation("$wrappers:kotlin-csstype")
+
                 implementation(npm("jszip", "3.10.1"))
                 implementation(npm("file-saver", "2.0.5"))
-                implementation(npm("@types/file-saver", "2.0.5"))
+                implementation(npm("react-modal","3.16.1"))
+                implementation(npm("@types/react-modal","3.13.1",true))
             }
         }
     }
@@ -101,7 +105,7 @@ tasks.getByName<Jar>("jvmJar") {
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = "17"
         }
     }
 }

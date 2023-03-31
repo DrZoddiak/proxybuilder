@@ -48,3 +48,8 @@ external interface JSZipGeneratorOptions {
         set(value) = definedExternally
 }
 
+fun generatorOptions(type: String? = ""): JSZipGeneratorOptions {
+    val o = js("({})")
+    o["type"] = type
+    return o
+}

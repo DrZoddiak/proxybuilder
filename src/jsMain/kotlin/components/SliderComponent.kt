@@ -1,7 +1,8 @@
 package components
 
-import Api
-import csstype.ClassName
+import api.Api
+import csstype.*
+import emotion.react.css
 import org.w3c.dom.HTMLInputElement
 import react.FC
 import react.Props
@@ -30,6 +31,7 @@ val SliderComponent = FC<CheckboxProps> { props ->
     }
 
     div {
+
         input {
             this.checked = checked
             onChange = changeHandler
@@ -37,11 +39,25 @@ val SliderComponent = FC<CheckboxProps> { props ->
             id = "react-switch-new"
             type = InputType.checkbox
         }
-        label {
-            className = ClassName("react-switch-label")
-            htmlFor = "react-switch-new"
-            span {
-                className = ClassName("react-switch-button")
+        div {
+            css {
+                display = Display.flex
+                alignItems = AlignItems.center
+                justifyContent = JustifyContent.spaceBetween
+                cursor = Cursor.pointer
+                width = 50.px
+                height = 25.px
+                borderRadius = 50.px
+                position = Position.relative
+                background = Color(if (checked) "gray" else "blue")
+                transitionDelay = .2.s
+            }
+            label {
+                className = ClassName("react-switch-label")
+                htmlFor = "react-switch-new"
+                span {
+                    className = ClassName("react-switch-button")
+                }
             }
         }
     }

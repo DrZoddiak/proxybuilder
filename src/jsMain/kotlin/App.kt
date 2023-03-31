@@ -1,16 +1,15 @@
-
-import Api.addFinalizedCard
-import Api.cardLookup
-import Api.deleteArtCards
-import Api.deleteFinalizedCard
-import Api.deleteFinalizedCards
-import Api.getArtCardList
-import Api.getFinalizedCardList
-import Api.printsLookup
-import Api.reloadArtCards
-import Api.zipFiles
+import api.Api.addFinalizedCard
+import api.Api.cardLookup
+import api.Api.deleteArtCards
+import api.Api.deleteFinalizedCard
+import api.Api.deleteFinalizedCards
+import api.Api.getArtCardList
+import api.Api.getFinalizedCardList
+import api.Api.reloadArtCards
+import api.Api.scryfallApi
+import api.Api.zipFiles
 import components.InputComponent
-import components.SliderComponent
+import components.modalComponent
 import csstype.ClassName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -25,11 +24,12 @@ import react.dom.html.ReactHTML.img
 import react.dom.html.ReactHTML.p
 import react.dom.html.ReactHTML.ul
 
-private val scope = MainScope()
+val scope = MainScope()
 
 val App = FC<Props> {
     var deckList by useState(emptyList<FinalizedCard>())
     var artList by useState(emptyList<ArtCard>())
+    val (modalIsOpen, setIsOpen) = useState(false)
     useEffectOnce {
         scope.launch {
             deckList = getFinalizedCardList()
@@ -41,27 +41,29 @@ val App = FC<Props> {
     }
     p { i { +"Powered by Ktor & Scryfall!" } }
     hr()
-    button {
-        +"Delete"
-        onClick = {
-            scope.launch {
-                deleteFinalizedCards()
-                deleteArtCards()
-                artList = getArtCardList()
-                deckList = getFinalizedCardList()
+    div {
+        button {
+            +"Delete"
+            onClick = {
+                scope.launch {
+                    deleteFinalizedCards()
+                    deleteArtCards()
+                    artList = getArtCardList()
+                    deckList = getFinalizedCardList()
+                }
             }
         }
-    }
-    button {
-        +"Download"
-        onClick = {
-            scope.launch {
-                zipFiles(deckList)
+        button {
+            +"Download"
+            onClick = {
+                scope.launch {
+                    zipFiles(deckList)
+                }
             }
         }
-    }
-    p {
-        +"cards: ${deckList.size}"
+        p {
+            +"cards: ${deckList.size}"
+        }
     }
     //Selected cards
     ul {
@@ -78,8 +80,10 @@ val App = FC<Props> {
                 img {
                     className = ClassName("cardimg")
                     src = deck.imageUri
+                    alt = deck.name
                     onClick = {
                         scope.launch {
+                            setIsOpen(true)
                             reloadArtCards(deck.name)
                             artList = getArtCardList()
                         }
@@ -98,56 +102,58 @@ val App = FC<Props> {
         }
     }
     hr()
-    //Art Selection
-    SliderComponent {
-        handleToggle = {
+    InputComponent {
+        onSubmit = { input ->
             scope.launch {
-                Api.uniqueSetting = it
-                if (artList.isNotEmpty()) {
-                    reloadArtCards(artList[0].name)
-                    artList = getArtCardList()
-                }
+                cardLookup(input)
+                    .map {
+                        val cat =
+                            "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
+                        FinalizedCard(
+                            it.id,
+                            it.name,
+                            it.imageUris?.normal ?: cat,
+                            scryfallApi.artLookup(it.printsSearchUri).totalCards
+                        )
+                    }
+                    .forEach {
+                        addFinalizedCard(it)
+                    }
+                deckList = getFinalizedCardList()
             }
         }
     }
-    ul {
-        artList.forEach { artCard ->
-            key = artCard.toString()
-            div {
-                className = ClassName("card")
-                img {
-                    className = ClassName("cardimg")
-                    src = artCard.imageUri
-                    onClick = {
-                        scope.launch {
-                            val oldCard = getFinalizedCardList().find { it.name == artCard.name }
-                            oldCard?.let { card -> deleteFinalizedCard(card) }
-                            addFinalizedCard(artCard.asFinalizedCard())
-                            deleteArtCards()
-                            artList = getArtCardList()
-                            deckList = getFinalizedCardList()
+    modalComponent {
+        isOpen = modalIsOpen
+        content = VFC {
+            ul {
+                artList.forEach { artCard ->
+                    key = artCard.toString()
+                    div {
+                        className = ClassName("card")
+                        img {
+                            className = ClassName("cardimg")
+                            src = artCard.imageUri
+                            onClick = {
+                                scope.launch {
+                                    val oldCard = getFinalizedCardList().find { it.name == artCard.name }
+                                    oldCard?.let { card -> deleteFinalizedCard(card) }
+                                    addFinalizedCard(artCard.asFinalizedCard())
+                                    setIsOpen(false)
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
-    }
-    hr()
-//Input Form
-    InputComponent {
-        onSubmit = { input ->
+        onRequestClose = {
+            setIsOpen(false)
+        }
+        onClose = {
             scope.launch {
-                cardLookup(input)
-                    .map { it.data }
-                    .map { it[0] }
-                    .map {
-                        val cat = "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
-                        FinalizedCard(it.id, it.name, it.imageUris?.png ?: cat, printsLookup(it.printsSearchUri))
-                    }
-                    .forEach {
-                        addFinalizedCard(it)
-                    }
+                deleteArtCards()
+                artList = getArtCardList()
                 deckList = getFinalizedCardList()
             }
         }

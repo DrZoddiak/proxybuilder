@@ -12,6 +12,9 @@ data class FinalizedCard(
     companion object {
         const val path = "/finalizedCard"
     }
+
+    override val staticPath: String
+        get() = path
 }
 
 @Serializable
@@ -25,6 +28,9 @@ data class ArtCard(
         const val path = "/artcard"
     }
 
+    override val staticPath: String
+        get() = path
+
     fun asFinalizedCard(): FinalizedCard {
         return FinalizedCard(cardId, name, imageUri, totalCards)
     }
@@ -35,4 +41,5 @@ interface Card {
     val name : String
     var imageUri : String
     val totalCards : Int
+    val staticPath : String
 }

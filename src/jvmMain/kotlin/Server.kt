@@ -1,4 +1,3 @@
-
 import com.mongodb.ConnectionString
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -43,7 +42,7 @@ fun main() {
             val targetSrc = "scryfall.com"
             val embedSrc = "embed.$targetSrc"
             headersOf(
-                "connect-src" to listOf("api.$targetSrc",embedSrc),
+                "connect-src" to listOf("api.$targetSrc", embedSrc),
                 "img-src" to listOf("*.scryfall.io"),
                 "style-src" to listOf(embedSrc),
                 "script-src" to listOf(embedSrc),
@@ -58,7 +57,8 @@ fun main() {
         routing {
             get("/") {
                 call.respondText(
-                    this::class.java.classLoader.getResource("index.html")!!.readText(),
+                    this::class.java.classLoader.getResource("index.html")?.readText()
+                        ?: error("Failed to load resource"),
                     ContentType.Text.Html
                 )
             }

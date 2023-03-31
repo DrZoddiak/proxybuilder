@@ -12,6 +12,13 @@ data class BaseResponse(
 @Serializable
 data class ImageTypes(
     val png: String,
+    @SerialName("border_crop")
+    val borderCrop : String,
+    @SerialName("art_crop")
+    val artCrop : String,
+    val large : String,
+    val normal : String,
+    val small : String
 ) {
     override fun toString(): String = png
 }
