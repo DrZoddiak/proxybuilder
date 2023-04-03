@@ -10,7 +10,10 @@ import api.WebClient.deleteCards
 import api.WebClient.jsonClient
 import io.ktor.client.fetch.*
 import kotlinx.coroutines.await
-import libraries.*
+import libraries.FileSaver
+import libraries.JSZip
+import libraries.generatorOptions
+import libraries.invoke
 
 object Api {
     val scryfallApi by lazy {
@@ -76,8 +79,11 @@ object Api {
         val cat =
             "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
         val artCards = singleCardLookup(card)?.map {
+            val imageUris = it.imageUris
+            val normal = imageUris?.normal ?: cat
+            val minified = imageUris?.small ?: cat
             ArtCard(
-                it.id, it.name, it.imageUris?.normal ?: cat, 2
+                it.id, it.name, normal,minified, 2
             )
         }
 

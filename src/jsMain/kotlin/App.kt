@@ -1,3 +1,4 @@
+import api.Api
 import api.Api.addFinalizedCard
 import api.Api.cardLookup
 import api.Api.deleteArtCards
@@ -5,9 +6,9 @@ import api.Api.deleteFinalizedCard
 import api.Api.deleteFinalizedCards
 import api.Api.getArtCardList
 import api.Api.getFinalizedCardList
-import api.Api.reloadArtCards
 import api.Api.scryfallApi
 import api.Api.zipFiles
+import components.ImageComponent
 import components.InputComponent
 import components.modalComponent
 import csstype.ClassName
@@ -30,10 +31,12 @@ val App = FC<Props> {
     var deckList by useState(emptyList<FinalizedCard>())
     var artList by useState(emptyList<ArtCard>())
     val (modalIsOpen, setIsOpen) = useState(false)
+    var isLoading by useState(true)
     useEffectOnce {
         scope.launch {
             deckList = getFinalizedCardList()
             artList = getArtCardList()
+            isLoading = false
         }
     }
     h1 {
@@ -41,6 +44,7 @@ val App = FC<Props> {
     }
     p { i { +"Powered by Ktor & Scryfall!" } }
     hr()
+    //Buttons & Card Counter
     div {
         button {
             +"Delete"
@@ -65,26 +69,39 @@ val App = FC<Props> {
             +"cards: ${deckList.size}"
         }
     }
-    //Selected cards
-    ul {
-        deckList.forEach { deck ->
-            key = deck.toString()
+    //Loader
+    div {
+        className = ClassName("loadingio-spinner-magnify-x8bpipc3dcs" + if (!isLoading) " sneaky" else "")
+        div {
+            className = ClassName("ldio-wxp2nv6ydn")
+
             div {
-                className = ClassName("card")
                 div {
-                    className = ClassName(if (deck.totalCards > 1) "caption" else "captionOff")
-                    i {
-                        className = ClassName("fa-solid fa-square-plus")
+                    div {
+
+                    }
+                    div {
+
                     }
                 }
-                img {
-                    className = ClassName("cardimg")
+            }
+        }
+    }
+    //Selected Cards
+    ul {
+        deckList.map { deck ->
+            key = deck.toString()
+            div {
+                //TODO Replace with ProgressiveImage
+                ImageComponent {
                     src = deck.imageUri
+                    placeholder = deck.altImageUri
                     alt = deck.name
+                    totalCards = deck.totalCards
                     onClick = {
                         scope.launch {
                             setIsOpen(true)
-                            reloadArtCards(deck.name)
+                            Api.reloadArtCards(deck.name)
                             artList = getArtCardList()
                         }
                     }
@@ -94,25 +111,27 @@ val App = FC<Props> {
                             deckList = getFinalizedCardList()
                         }
                     }
-                    onContextMenu = {
-                        it.preventDefault()
-                    }
                 }
             }
         }
     }
     hr()
+    //Input Box
     InputComponent {
         onSubmit = { input ->
             scope.launch {
+                isLoading = true
                 cardLookup(input)
                     .map {
                         val cat =
                             "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
+                        val normal = it.imageUris?.normal ?: cat
+                        val minified = it.imageUris?.small ?: cat
                         FinalizedCard(
                             it.id,
                             it.name,
-                            it.imageUris?.normal ?: cat,
+                            normal,
+                            minified,
                             scryfallApi.artLookup(it.printsSearchUri).totalCards
                         )
                     }
@@ -120,9 +139,12 @@ val App = FC<Props> {
                         addFinalizedCard(it)
                     }
                 deckList = getFinalizedCardList()
+            }.invokeOnCompletion {
+                isLoading = false
             }
         }
     }
+    //Art card Modal
     modalComponent {
         isOpen = modalIsOpen
         content = VFC {
@@ -158,6 +180,7 @@ val App = FC<Props> {
             }
         }
     }
+    //Return
     a {
         href = "/"
         +"Back to the main page"
