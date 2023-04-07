@@ -82,6 +82,7 @@ val App = FC<Props> {
         sx {
             width = 1334.px
             height = 803.px
+            padding = 30.px
             gap = 10.px
             margin = Auto.auto
         }
@@ -112,6 +113,11 @@ val App = FC<Props> {
                         }
                         onContextMenu = {
                             it.preventDefault()
+                        }
+                    }
+                    ImageListItemBar {
+                        title = Fragment.create {
+                            +card.name
                         }
                     }
                 }
@@ -158,7 +164,10 @@ val App = FC<Props> {
         ImageList {
             sx {
                 width = 546.px
-                margin = 10.px
+                height = 803.px
+                padding = 30.px
+                margin = Auto.auto
+                gap = 10.px
             }
             cols = 3
             rowHeight = 261

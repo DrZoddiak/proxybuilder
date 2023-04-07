@@ -2,115 +2,19 @@ body {
     text-align: center;
     font-family: sans-serif
 }
-.cardimg {
-    position : relative;
-    width: 182px;
-    height: 261px;
-    padding: 5px;
-}
 
-ul {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.caption {
-    position: absolute;
-    z-index: 1;
-    visibility: hidden;
-    transform: translate( 55%, 25% );
-    text-align: center;
-    color: white;
-    font-weight: bold;
-}
-
-.captionOff {
-    display: none;
-}
-
-.card:hover > .caption {
-    visibility: visible;
-}
-
-.card:hover > .cardimg {
+li:hover > .cardimg {
     opacity: .9
-}
-
-.Modal {
-    position: absolute;
-    top: 20%;
-    left: 40px;
-    right: 40px;
-    bottom: auto;
-    background-color: papayawhip;
-}
-
-.Overlay {
-    overflow-x: hidden;
-    overflow-y: auto;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: black;
-    background: rgba(0,0,0,0.9);
 }
 
 .sneaky {
     display : none !important;
 }
 
-@keyframes ldio-wxp2nv6ydn {
-    0%    { transform: translate(2px,2px) }
-   33.33% { transform: translate(102px,2px) }
-   66.66% { transform: translate(42px,102px) }
-  100%    { transform: translate(2px,2px) }
+.MuiImageListItemBar-root {
+    display: none;
 }
 
-
-.ldio-wxp2nv6ydn > div {
-  transform: scale(0.8);
-  transform-origin: 100px 100px;
+li:hover > .MuiImageListItemBar-root {
+    display: initial;
 }
-
-.ldio-wxp2nv6ydn > div > div {
-  animation: ldio-wxp2nv6ydn 1.639344262295082s linear infinite;
-  position: absolute
-}
-
-.ldio-wxp2nv6ydn > div > div div:nth-child(1) {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: 12px solid #e90c59;
-  background: #46dff0
-}
-
-.ldio-wxp2nv6ydn > div > div div:nth-child(2) {
-  width: 17px;
-  height:  51px;
-  transform: rotate(-45deg);
-  background: #e90c59;
-  border-radius: 0 0 8px 8px;
-  position: absolute;
-  top: 68px;
-  left: 85px
-}
-.loadingio-spinner-magnify-x8bpipc3dcs {
-  width: 200px;
-  height: 200px;
-  display: inline-block;
-  overflow: hidden;
-  background: #ffffff;
-}
-.ldio-wxp2nv6ydn {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform: translateZ(0) scale(1);
-  backface-visibility: hidden;
-  transform-origin: 0 0; /* see note above */
-}
-.ldio-wxp2nv6ydn div { box-sizing: content-box; }
