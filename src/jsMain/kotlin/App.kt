@@ -1,14 +1,15 @@
-import api.Api
-import api.Api.addFinalizedCard
-import api.Api.cardLookup
-import api.Api.deleteArtCards
-import api.Api.deleteFinalizedCard
-import api.Api.deleteFinalizedCards
-import api.Api.getArtCardList
-import api.Api.getFinalizedCardList
-import api.Api.replaceFinalizedCard
+
 import api.Api.scryfallApi
-import api.Api.zipFiles
+import api.card.ArtCardAPI.deleteArtCards
+import api.card.ArtCardAPI.getArtCardList
+import api.card.ArtCardAPI.reloadArtCards
+import api.card.CardLookupAPI.cardLookup
+import api.card.FinalizedCardAPI.addFinalizedCard
+import api.card.FinalizedCardAPI.deleteFinalizedCard
+import api.card.FinalizedCardAPI.deleteFinalizedCards
+import api.card.FinalizedCardAPI.getFinalizedCardList
+import api.card.FinalizedCardAPI.replaceFinalizedCard
+import api.library.DownloadAPI.zipFiles
 import components.InputComponent
 import csstype.Auto
 import csstype.ClassName
@@ -19,8 +20,6 @@ import mui.material.*
 import mui.system.sx
 import react.*
 import react.dom.html.ImgLoading
-import react.dom.html.ReactHTML.a
-import react.dom.html.ReactHTML.button
 import react.dom.html.ReactHTML.div
 import react.dom.html.ReactHTML.h1
 import react.dom.html.ReactHTML.hr
@@ -49,8 +48,10 @@ val App = FC<Props> {
     hr()
     //Buttons & Card Counter
     div {
-        button {
+        Button {
             +"Delete"
+            variant = ButtonVariant.contained
+            color = ButtonColor.error
             onClick = {
                 scope.launch {
                     deleteFinalizedCards()
@@ -60,8 +61,10 @@ val App = FC<Props> {
                 }
             }
         }
-        button {
+        Button {
             +"Download"
+            variant = ButtonVariant.contained
+            color = ButtonColor.primary
             onClick = {
                 scope.launch {
                     zipFiles(deckList)
@@ -101,7 +104,7 @@ val App = FC<Props> {
                         onClick = {
                             scope.launch {
                                 setIsOpen(true)
-                                Api.reloadArtCards(card.name)
+                                reloadArtCards(card.name)
                                 artList = getArtCardList()
                             }
                         }
@@ -189,7 +192,6 @@ val App = FC<Props> {
                                     deckList = getFinalizedCardList()
                                     deleteArtCards()
                                     artList = getArtCardList()
-
                                 }
                             }
                         }
@@ -197,11 +199,6 @@ val App = FC<Props> {
                 }
             }
         }
-    }
-    //Return
-    a {
-        href = "/"
-        +"Back to the main page"
     }
 }
 
