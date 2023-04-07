@@ -1,4 +1,3 @@
-
 import api.Api
 import api.Api.addFinalizedCard
 import api.Api.cardLookup
@@ -7,6 +6,7 @@ import api.Api.deleteFinalizedCard
 import api.Api.deleteFinalizedCards
 import api.Api.getArtCardList
 import api.Api.getFinalizedCardList
+import api.Api.replaceFinalizedCard
 import api.Api.scryfallApi
 import api.Api.zipFiles
 import components.InputComponent
@@ -74,6 +74,7 @@ val App = FC<Props> {
     }
     //Loader
     CircularProgress {
+        color = CircularProgressColor.secondary
         className = ClassName(if (!isLoading) " sneaky" else "")
     }
     //Selected Cards
@@ -108,6 +109,9 @@ val App = FC<Props> {
                                 deleteFinalizedCard(card)
                                 deckList = getFinalizedCardList()
                             }
+                        }
+                        onContextMenu = {
+                            it.preventDefault()
                         }
                     }
                 }
@@ -171,8 +175,7 @@ val App = FC<Props> {
                             onClick = {
                                 scope.launch {
                                     val oldCard = getFinalizedCardList().find { it.name == card.name }
-                                    oldCard?.let { card -> deleteFinalizedCard(card) }
-                                    addFinalizedCard(card.asFinalizedCard())
+                                    oldCard?.let { old -> replaceFinalizedCard(old, card) }
                                     setIsOpen(false)
                                     deckList = getFinalizedCardList()
                                     deleteArtCards()

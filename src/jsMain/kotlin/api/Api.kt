@@ -8,6 +8,7 @@ import api.WebClient.addCards
 import api.WebClient.cardList
 import api.WebClient.deleteCards
 import api.WebClient.jsonClient
+import api.WebClient.replaceCard
 import io.ktor.client.fetch.*
 import kotlinx.coroutines.await
 import libraries.FileSaver
@@ -44,6 +45,10 @@ object Api {
 
     suspend fun deleteArtCards() {
         deleteCards(ArtCard.path)
+    }
+
+    suspend fun replaceFinalizedCard(card: FinalizedCard, artCard: ArtCard) {
+        replaceCard(card, artCard)
     }
 
     suspend fun deleteFinalizedCards() {

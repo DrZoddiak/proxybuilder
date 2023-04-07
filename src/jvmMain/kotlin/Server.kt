@@ -1,3 +1,4 @@
+
 import com.mongodb.ConnectionString
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -11,6 +12,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
@@ -28,6 +30,13 @@ val database by lazy {
 val cardlection = database.getCollection<FinalizedCard>()
 val artlection = database.getCollection<ArtCard>()
 
+fun PipelineContext<*, ApplicationCall>.callId(): Int {
+    return call.parameters["id"]?.toInt() ?: error("Invalid delete request")
+}
+
+suspend fun PipelineContext<*, ApplicationCall>.respondOk() {
+    return call.respond(HttpStatusCode.OK)
+}
 
 fun main() {
     val port = System.getenv("PORT")?.toInt() ?: 9090
@@ -71,16 +80,23 @@ fun main() {
                 }
                 post {
                     cardlection.insertOne(call.receive())
-                    call.respond(HttpStatusCode.OK)
+                    respondOk()
                 }
                 delete("/{id}") {
-                    val id = call.parameters["id"]?.toInt() ?: error("Invalid delete request")
+                    val id = callId()
                     cardlection.deleteOne(FinalizedCard::id eq id)
-                    call.respond(HttpStatusCode.OK)
+                    respondOk()
+                }
+                //replace
+                post("/{id}/replace") {
+                    val id = callId()
+                    val card = call.receive<FinalizedCard>()
+                    cardlection.replaceOne(FinalizedCard::id eq id, card)
+                    respondOk()
                 }
                 delete {
                     cardlection.drop()
-                    call.respond(HttpStatusCode.OK)
+                    respondOk()
                 }
             }
             route(ArtCard.path) {
@@ -89,11 +105,11 @@ fun main() {
                 }
                 post {
                     artlection.insertOne(call.receive())
-                    call.respond(HttpStatusCode.OK)
+                    respondOk()
                 }
                 delete {
                     artlection.drop()
-                    call.respond(HttpStatusCode.OK)
+                    respondOk()
                 }
             }
         }

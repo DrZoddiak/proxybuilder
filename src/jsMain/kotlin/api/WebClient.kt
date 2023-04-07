@@ -1,6 +1,8 @@
 package api
 
+import ArtCard
 import Card
+import FinalizedCard
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.js.*
@@ -27,6 +29,13 @@ object WebClient {
 
     internal suspend inline fun <reified T> cardList(path: String): List<T> {
         return jsonClient.get(path).body()
+    }
+
+    internal suspend inline fun replaceCard(card: FinalizedCard, artCard: ArtCard) {
+        jsonClient.post("${card.staticPath}/${card.id}/replace") {
+            contentType(ContentType.Application.Json)
+            setBody(artCard.asFinalizedCard())
+        }
     }
 
     internal suspend inline fun <reified T : Card> addCards(cards: List<T>) {
