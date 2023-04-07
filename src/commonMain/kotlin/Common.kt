@@ -5,7 +5,6 @@ data class FinalizedCard(
     override val cardId: String,
     override val name: String,
     override var imageUri: String,
-    override var altImageUri: String,
     override val totalCards: Int
 ) : Card {
     val id: Int = cardId.hashCode()
@@ -23,7 +22,6 @@ data class ArtCard(
     override val cardId: String,
     override val name: String,
     override var imageUri: String,
-    override var altImageUri: String,
     override val totalCards: Int
 ) : Card {
     companion object {
@@ -34,7 +32,7 @@ data class ArtCard(
         get() = path
 
     fun asFinalizedCard(): FinalizedCard {
-        return FinalizedCard(cardId, name, imageUri, altImageUri, totalCards)
+        return FinalizedCard(cardId, name, imageUri, totalCards)
     }
 }
 
@@ -42,7 +40,6 @@ interface Card {
     val cardId: String
     val name: String
     var imageUri: String
-    var altImageUri: String
     val totalCards: Int
     val staticPath: String
 }

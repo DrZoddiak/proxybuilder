@@ -1,3 +1,4 @@
+
 import api.Api
 import api.Api.addFinalizedCard
 import api.Api.cardLookup
@@ -8,13 +9,16 @@ import api.Api.getArtCardList
 import api.Api.getFinalizedCardList
 import api.Api.scryfallApi
 import api.Api.zipFiles
-import components.ImageComponent
 import components.InputComponent
-import components.modalComponent
+import csstype.Auto
 import csstype.ClassName
+import csstype.px
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import mui.material.*
+import mui.system.sx
 import react.*
+import react.dom.html.ImgLoading
 import react.dom.html.ReactHTML.a
 import react.dom.html.ReactHTML.button
 import react.dom.html.ReactHTML.div
@@ -23,7 +27,6 @@ import react.dom.html.ReactHTML.hr
 import react.dom.html.ReactHTML.i
 import react.dom.html.ReactHTML.img
 import react.dom.html.ReactHTML.p
-import react.dom.html.ReactHTML.ul
 
 val scope = MainScope()
 
@@ -70,45 +73,41 @@ val App = FC<Props> {
         }
     }
     //Loader
-    div {
-        className = ClassName("loadingio-spinner-magnify-x8bpipc3dcs" + if (!isLoading) " sneaky" else "")
-        div {
-            className = ClassName("ldio-wxp2nv6ydn")
-
-            div {
-                div {
-                    div {
-
-                    }
-                    div {
-
-                    }
-                }
-            }
-        }
+    CircularProgress {
+        className = ClassName(if (!isLoading) " sneaky" else "")
     }
     //Selected Cards
-    ul {
-        deckList.map { deck ->
-            key = deck.toString()
-            div {
-                //TODO Replace with ProgressiveImage
-                ImageComponent {
-                    src = deck.imageUri
-                    placeholder = deck.altImageUri
-                    alt = deck.name
-                    totalCards = deck.totalCards
-                    onClick = {
-                        scope.launch {
-                            setIsOpen(true)
-                            Api.reloadArtCards(deck.name)
-                            artList = getArtCardList()
+    ImageList {
+        sx {
+            width = 1334.px
+            height = 803.px
+            gap = 10.px
+            margin = Auto.auto
+        }
+        rowHeight = 261
+        cols = 7
+        children = Fragment.create {
+            deckList.map { card ->
+                ImageListItem {
+                    key = card.toString()
+                    img {
+                        className = ClassName("cardimg")
+                        src = "${card.imageUri}?w=182&h=261&auto=format"
+                        srcSet = "${card.imageUri}?w=182&h=261&auto=format&dpr=2 2x"
+                        alt = card.name
+                        loading = ImgLoading.lazy
+                        onClick = {
+                            scope.launch {
+                                setIsOpen(true)
+                                Api.reloadArtCards(card.name)
+                                artList = getArtCardList()
+                            }
                         }
-                    }
-                    onAuxClick = {
-                        scope.launch {
-                            deleteFinalizedCard(deck)
-                            deckList = getFinalizedCardList()
+                        onAuxClick = {
+                            scope.launch {
+                                deleteFinalizedCard(card)
+                                deckList = getFinalizedCardList()
+                            }
                         }
                     }
                 }
@@ -126,12 +125,10 @@ val App = FC<Props> {
                         val cat =
                             "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
                         val normal = it.imageUris?.normal ?: cat
-                        val minified = it.imageUris?.small ?: cat
                         FinalizedCard(
                             it.id,
                             it.name,
                             normal,
-                            minified,
                             scryfallApi.artLookup(it.printsSearchUri).totalCards
                         )
                     }
@@ -145,38 +142,47 @@ val App = FC<Props> {
         }
     }
     //Art card Modal
-    modalComponent {
-        isOpen = modalIsOpen
-        content = VFC {
-            ul {
-                artList.forEach { artCard ->
-                    key = artCard.toString()
-                    div {
-                        className = ClassName("card")
+    Dialog {
+        maxWidth = "md"
+        open = modalIsOpen
+        DialogTitle {
+            +"Select an art card!"
+        }
+        onClose = { _, _ ->
+            setIsOpen(false)
+        }
+        ImageList {
+            sx {
+                width = 546.px
+                margin = 10.px
+            }
+            cols = 3
+            rowHeight = 261
+            children = Fragment.create {
+                artList.map { card ->
+                    ImageListItem {
+                        key = card.imageUri
                         img {
                             className = ClassName("cardimg")
-                            src = artCard.imageUri
+                            src = "${card.imageUri}?&auto=format"
+                            srcSet = "${card.imageUri}?&auto=format&dpr=2 2x"
+                            alt = card.name
+                            loading = ImgLoading.lazy
                             onClick = {
                                 scope.launch {
-                                    val oldCard = getFinalizedCardList().find { it.name == artCard.name }
+                                    val oldCard = getFinalizedCardList().find { it.name == card.name }
                                     oldCard?.let { card -> deleteFinalizedCard(card) }
-                                    addFinalizedCard(artCard.asFinalizedCard())
+                                    addFinalizedCard(card.asFinalizedCard())
                                     setIsOpen(false)
+                                    deckList = getFinalizedCardList()
+                                    deleteArtCards()
+                                    artList = getArtCardList()
+
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-        onRequestClose = {
-            setIsOpen(false)
-        }
-        onClose = {
-            scope.launch {
-                deleteArtCards()
-                artList = getArtCardList()
-                deckList = getFinalizedCardList()
             }
         }
     }

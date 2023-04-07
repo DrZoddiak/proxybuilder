@@ -72,13 +72,13 @@ kotlin {
                 implementation(project.dependencies.enforcedPlatform("$wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
                 implementation("$wrappers:kotlin-react")
                 implementation("$wrappers:kotlin-react-dom")
+
                 implementation("$wrappers:kotlin-emotion")
-                implementation("$wrappers:kotlin-csstype")
+                implementation("$wrappers:kotlin-mui")
+                implementation("$wrappers:kotlin-mui-icons")
 
                 implementation(npm("jszip", "3.10.1"))
                 implementation(npm("file-saver", "2.0.5"))
-                implementation(npm("react-modal","3.16.1"))
-                implementation(npm("@types/react-modal","3.13.1",true))
             }
         }
     }

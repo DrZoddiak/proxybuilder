@@ -81,9 +81,8 @@ object Api {
         val artCards = singleCardLookup(card)?.map {
             val imageUris = it.imageUris
             val normal = imageUris?.normal ?: cat
-            val minified = imageUris?.small ?: cat
             ArtCard(
-                it.id, it.name, normal,minified, 2
+                it.id, it.name, normal, 2
             )
         }
 
