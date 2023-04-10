@@ -2,7 +2,7 @@ package components
 
 import ArtCard
 import FinalizedCard
-import api.card.ArtCardAPI
+import api.card.ArtCardAPI.loadArtCards
 import api.card.FinalizedCardAPI
 import csstype.ClassName
 import kotlinx.coroutines.launch
@@ -14,43 +14,45 @@ import react.dom.html.ReactHTML.img
 import scope
 
 external interface DeckListProps : Props {
-    var deckList: List<FinalizedCard>
+    var finalizedCard: FinalizedCard
     var setArtList: StateSetter<List<ArtCard>>
     var setDeckList: StateSetter<List<FinalizedCard>>
     var setDialogIsOpen: StateSetter<Boolean>
 }
 
 val DeckListComponent = FC<DeckListProps> { props ->
-    props.deckList.map { card ->
-        ImageListItem {
-            key = card.toString()
-            img {
-                className = ClassName("cardimg")
-                src = "${card.imageUri}?w=182&h=261&auto=format"
-                srcSet = "${card.imageUri}?w=182&h=261&auto=format&dpr=2 2x"
-                alt = card.name
-                loading = ImgLoading.lazy
-                onClick = {
-                    scope.launch {
-                        props.setDialogIsOpen(true)
-                        ArtCardAPI.reloadArtCards(card.name)
-                        props.setArtList(ArtCardAPI.getArtCardList())
-                    }
-                }
-                onAuxClick = {
-                    scope.launch {
-                        FinalizedCardAPI.deleteFinalizedCard(card)
-                        props.setDeckList(FinalizedCardAPI.getFinalizedCardList())
-                    }
-                }
-                onContextMenu = {
-                    it.preventDefault()
+    var artCards by useState(emptyList<ArtCard>())
+    useEffectOnce {
+        scope.launch {
+            artCards = loadArtCards(props.finalizedCard)
+        }
+    }
+
+    ImageListItem {
+        key = props.finalizedCard.toString()
+        img {
+            className = ClassName("cardimg")
+            src = "${props.finalizedCard.imageUri}?w=182&h=261&auto=format"
+            srcSet = "${props.finalizedCard.imageUri}?w=182&h=261&auto=format&dpr=2 2x"
+            alt = props.finalizedCard.name
+            loading = ImgLoading.lazy
+            onClick = {
+                props.setDialogIsOpen(true)
+                props.setArtList(artCards)
+            }
+            onAuxClick = {
+                scope.launch {
+                    FinalizedCardAPI.deleteFinalizedCard(props.finalizedCard)
+                    props.setDeckList(FinalizedCardAPI.getFinalizedCardList())
                 }
             }
-            ImageListItemBar {
-                title = Fragment.create {
-                    +card.name
-                }
+            onContextMenu = {
+                it.preventDefault()
+            }
+        }
+        ImageListItemBar {
+            title = Fragment.create {
+                +props.finalizedCard.name
             }
         }
     }

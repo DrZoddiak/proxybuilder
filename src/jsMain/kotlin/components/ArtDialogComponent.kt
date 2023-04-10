@@ -15,15 +15,12 @@ import react.create
 
 external interface ArtDialogProps : Props {
     var modalIsOpen: Boolean
+    var artList : List<ArtCard>
     var setIsOpen: StateSetter<Boolean>
-    var artList: List<ArtCard>
-    var setArtList: StateSetter<List<ArtCard>>
     var setDeckList: StateSetter<List<FinalizedCard>>
 }
 
 val ArtDialogComponent = FC<ArtDialogProps> { props ->
-
-
 
     Dialog {
         maxWidth = "md"
@@ -46,7 +43,6 @@ val ArtDialogComponent = FC<ArtDialogProps> { props ->
             rowHeight = 261
             children = DialogChildren.create {
                 this.artList = props.artList
-                this.setArtList = props.setArtList
                 this.setDeckList = props.setDeckList
                 this.setDialogIsOpen = props.setIsOpen
             }

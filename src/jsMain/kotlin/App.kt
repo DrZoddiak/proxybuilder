@@ -1,6 +1,5 @@
-
+import api.Api.sneaky
 import api.card.ArtCardAPI.deleteArtCards
-import api.card.ArtCardAPI.getArtCardList
 import api.card.FinalizedCardAPI.addFinalizedCard
 import api.card.FinalizedCardAPI.deleteFinalizedCards
 import api.card.FinalizedCardAPI.finalizedCards
@@ -11,19 +10,15 @@ import components.DeckListComponent
 import components.InputComponent
 import components.TitleComponent
 import csstype.Auto
-import csstype.ClassName
 import csstype.px
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mui.material.*
 import mui.system.sx
-import react.VFC
-import react.create
+import react.*
 import react.dom.html.ReactHTML.div
 import react.dom.html.ReactHTML.hr
 import react.dom.html.ReactHTML.p
-import react.useEffectOnce
-import react.useState
 
 val scope = MainScope()
 
@@ -35,7 +30,6 @@ val App = VFC {
     useEffectOnce {
         scope.launch {
             setDeckList(getFinalizedCardList())
-            setArtList(getArtCardList())
             isLoading = false
         }
     }
@@ -51,8 +45,8 @@ val App = VFC {
                 scope.launch {
                     deleteFinalizedCards()
                     deleteArtCards()
-                    setArtList(getArtCardList())
-                    setDeckList(getFinalizedCardList())
+                    setArtList(emptyList())
+                    setDeckList(emptyList())
                 }
             }
         }
@@ -73,8 +67,9 @@ val App = VFC {
     //Loader
     CircularProgress {
         color = CircularProgressColor.secondary
-        className = ClassName(if (!isLoading) " sneaky" else "")
+        className = isLoading.sneaky()
     }
+
     //Selected Cards
     ImageList {
         sx {
@@ -86,11 +81,15 @@ val App = VFC {
         }
         rowHeight = 261
         cols = 7
-        children = DeckListComponent.create {
-            this.deckList = deckList
-            this.setArtList = setArtList
-            this.setDeckList = setDeckList
-            this.setDialogIsOpen = setIsOpen
+        children = Fragment.create {
+            deckList.map { card ->
+                DeckListComponent {
+                    this.finalizedCard = card
+                    this.setArtList = setArtList
+                    this.setDeckList = setDeckList
+                    this.setDialogIsOpen = setIsOpen
+                }
+            }
         }
     }
     hr()
@@ -108,14 +107,11 @@ val App = VFC {
             }
         }
     }
-    //Art card Modal
     ArtDialogComponent {
+        this.artList = artList
         this.modalIsOpen = modalIsOpen
         this.setIsOpen = setIsOpen
-        this.artList = artList
-        this.setArtList = setArtList
         this.setDeckList = setDeckList
-        this.setIsOpen = setIsOpen
     }
 }
 
