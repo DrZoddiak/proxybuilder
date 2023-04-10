@@ -9,6 +9,7 @@ import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
@@ -44,8 +45,8 @@ object WebClient {
         }
     }
 
-    internal suspend inline fun <reified T : Card> addCard(card: T) {
-        jsonClient.post(card.staticPath) {
+    internal suspend inline fun <reified T : Card> addCard(card: T): HttpResponse {
+        return jsonClient.post(card.staticPath) {
             contentType(ContentType.Application.Json)
             setBody(card)
         }

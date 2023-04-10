@@ -1,16 +1,15 @@
 
-import api.Api.scryfallApi
 import api.card.ArtCardAPI.deleteArtCards
 import api.card.ArtCardAPI.getArtCardList
-import api.card.ArtCardAPI.reloadArtCards
-import api.card.CardLookupAPI.cardLookup
 import api.card.FinalizedCardAPI.addFinalizedCard
-import api.card.FinalizedCardAPI.deleteFinalizedCard
 import api.card.FinalizedCardAPI.deleteFinalizedCards
+import api.card.FinalizedCardAPI.finalizedCards
 import api.card.FinalizedCardAPI.getFinalizedCardList
-import api.card.FinalizedCardAPI.replaceFinalizedCard
 import api.library.DownloadAPI.zipFiles
+import components.ArtDialogComponent
+import components.DeckListComponent
 import components.InputComponent
+import components.TitleComponent
 import csstype.Auto
 import csstype.ClassName
 import csstype.px
@@ -18,33 +17,29 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mui.material.*
 import mui.system.sx
-import react.*
-import react.dom.html.ImgLoading
+import react.VFC
+import react.create
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.h1
 import react.dom.html.ReactHTML.hr
-import react.dom.html.ReactHTML.i
-import react.dom.html.ReactHTML.img
 import react.dom.html.ReactHTML.p
+import react.useEffectOnce
+import react.useState
 
 val scope = MainScope()
 
-val App = FC<Props> {
-    var deckList by useState(emptyList<FinalizedCard>())
-    var artList by useState(emptyList<ArtCard>())
+val App = VFC {
+    val (deckList, setDeckList) = useState(emptyList<FinalizedCard>())
+    val (artList, setArtList) = useState(emptyList<ArtCard>())
     val (modalIsOpen, setIsOpen) = useState(false)
     var isLoading by useState(true)
     useEffectOnce {
         scope.launch {
-            deckList = getFinalizedCardList()
-            artList = getArtCardList()
+            setDeckList(getFinalizedCardList())
+            setArtList(getArtCardList())
             isLoading = false
         }
     }
-    h1 {
-        +"MTG Proxy Builder"
-    }
-    p { i { +"Powered by Ktor & Scryfall!" } }
+    TitleComponent()
     hr()
     //Buttons & Card Counter
     div {
@@ -56,8 +51,8 @@ val App = FC<Props> {
                 scope.launch {
                     deleteFinalizedCards()
                     deleteArtCards()
-                    artList = getArtCardList()
-                    deckList = getFinalizedCardList()
+                    setArtList(getArtCardList())
+                    setDeckList(getFinalizedCardList())
                 }
             }
         }
@@ -91,40 +86,11 @@ val App = FC<Props> {
         }
         rowHeight = 261
         cols = 7
-        children = Fragment.create {
-            deckList.map { card ->
-                ImageListItem {
-                    key = card.toString()
-                    img {
-                        className = ClassName("cardimg")
-                        src = "${card.imageUri}?w=182&h=261&auto=format"
-                        srcSet = "${card.imageUri}?w=182&h=261&auto=format&dpr=2 2x"
-                        alt = card.name
-                        loading = ImgLoading.lazy
-                        onClick = {
-                            scope.launch {
-                                setIsOpen(true)
-                                reloadArtCards(card.name)
-                                artList = getArtCardList()
-                            }
-                        }
-                        onAuxClick = {
-                            scope.launch {
-                                deleteFinalizedCard(card)
-                                deckList = getFinalizedCardList()
-                            }
-                        }
-                        onContextMenu = {
-                            it.preventDefault()
-                        }
-                    }
-                    ImageListItemBar {
-                        title = Fragment.create {
-                            +card.name
-                        }
-                    }
-                }
-            }
+        children = DeckListComponent.create {
+            this.deckList = deckList
+            this.setArtList = setArtList
+            this.setDeckList = setDeckList
+            this.setDialogIsOpen = setIsOpen
         }
     }
     hr()
@@ -133,72 +99,23 @@ val App = FC<Props> {
         onSubmit = { input ->
             scope.launch {
                 isLoading = true
-                cardLookup(input)
-                    .map {
-                        val cat =
-                            "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
-                        val normal = it.imageUris?.normal ?: cat
-                        FinalizedCard(
-                            it.id,
-                            it.name,
-                            normal,
-                            scryfallApi.artLookup(it.printsSearchUri).totalCards
-                        )
-                    }
-                    .forEach {
-                        addFinalizedCard(it)
-                    }
-                deckList = getFinalizedCardList()
+                finalizedCards(input).forEach {
+                    addFinalizedCard(it)
+                }
+                setDeckList(getFinalizedCardList())
             }.invokeOnCompletion {
                 isLoading = false
             }
         }
     }
     //Art card Modal
-    Dialog {
-        maxWidth = "md"
-        open = modalIsOpen
-        DialogTitle {
-            +"Select an art card!"
-        }
-        onClose = { _, _ ->
-            setIsOpen(false)
-        }
-        ImageList {
-            sx {
-                width = 546.px
-                height = 803.px
-                padding = 30.px
-                margin = Auto.auto
-                gap = 10.px
-            }
-            cols = 3
-            rowHeight = 261
-            children = Fragment.create {
-                artList.map { card ->
-                    ImageListItem {
-                        key = card.imageUri
-                        img {
-                            className = ClassName("cardimg")
-                            src = "${card.imageUri}?&auto=format"
-                            srcSet = "${card.imageUri}?&auto=format&dpr=2 2x"
-                            alt = card.name
-                            loading = ImgLoading.lazy
-                            onClick = {
-                                scope.launch {
-                                    val oldCard = getFinalizedCardList().find { it.name == card.name }
-                                    oldCard?.let { old -> replaceFinalizedCard(old, card) }
-                                    setIsOpen(false)
-                                    deckList = getFinalizedCardList()
-                                    deleteArtCards()
-                                    artList = getArtCardList()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    ArtDialogComponent {
+        this.modalIsOpen = modalIsOpen
+        this.setIsOpen = setIsOpen
+        this.artList = artList
+        this.setArtList = setArtList
+        this.setDeckList = setDeckList
+        this.setIsOpen = setIsOpen
     }
 }
 
