@@ -3,28 +3,31 @@ package api.card
 import ArtCard
 import FinalizedCard
 import api.Api
-import api.WebClient
+import api.WebClient.addCard
+import api.WebClient.cardList
+import api.WebClient.deleteCards
+import api.WebClient.replaceCard
 import api.card.CardLookupAPI.cardLookup
 
 object FinalizedCardAPI {
     suspend fun getFinalizedCardList(): List<FinalizedCard> {
-        return WebClient.cardList(FinalizedCard.path)
+        return cardList(FinalizedCard.path)
     }
 
     suspend fun addFinalizedCard(finalizedCard: FinalizedCard) {
-        WebClient.addCard(finalizedCard)
+        addCard(finalizedCard)
     }
 
     suspend fun replaceFinalizedCard(card: FinalizedCard, artCard: ArtCard) {
-        WebClient.replaceCard(card, artCard)
+        replaceCard(card, artCard)
     }
 
     suspend fun deleteFinalizedCards() {
-        WebClient.deleteCards(FinalizedCard.path)
+        deleteCards(FinalizedCard.path)
     }
 
     suspend fun deleteFinalizedCard(finalizedCard: FinalizedCard) {
-        WebClient.deleteCards(FinalizedCard.path + "/${finalizedCard.id}")
+        deleteCards(FinalizedCard.path + "/${finalizedCard.id}")
     }
 
     suspend fun finalizedCards(input: String): List<FinalizedCard> {

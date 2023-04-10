@@ -28,7 +28,6 @@ val database by lazy {
 }
 
 val cardlection = database.getCollection<FinalizedCard>()
-val artlection = database.getCollection<ArtCard>()
 
 fun PipelineContext<*, ApplicationCall>.callId(): Int {
     return call.parameters["id"]?.toInt() ?: error("Invalid delete request")
@@ -96,19 +95,6 @@ fun main() {
                 }
                 delete {
                     cardlection.drop()
-                    respondOk()
-                }
-            }
-            route(ArtCard.path) {
-                get {
-                    call.respond(artlection.find().toList())
-                }
-                post {
-                    artlection.insertOne(call.receive())
-                    respondOk()
-                }
-                delete {
-                    artlection.drop()
                     respondOk()
                 }
             }

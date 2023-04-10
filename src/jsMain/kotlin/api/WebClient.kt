@@ -39,12 +39,6 @@ object WebClient {
         }
     }
 
-    internal suspend inline fun <reified T : Card> addCards(cards: List<T>) {
-        cards.forEach {
-            addCard(it)
-        }
-    }
-
     internal suspend inline fun <reified T : Card> addCard(card: T): HttpResponse {
         return jsonClient.post(card.staticPath) {
             contentType(ContentType.Application.Json)
