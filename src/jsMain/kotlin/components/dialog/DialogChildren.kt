@@ -1,4 +1,4 @@
-package components
+package components.dialog
 
 import ArtCard
 import FinalizedCard

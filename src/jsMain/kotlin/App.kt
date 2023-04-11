@@ -1,24 +1,20 @@
+
 import api.Api.sneaky
-import api.card.ArtCardAPI.deleteArtCards
 import api.card.FinalizedCardAPI.addFinalizedCard
-import api.card.FinalizedCardAPI.deleteFinalizedCards
 import api.card.FinalizedCardAPI.finalizedCards
 import api.card.FinalizedCardAPI.getFinalizedCardList
-import api.library.DownloadAPI.zipFiles
-import components.ArtDialogComponent
-import components.DeckListComponent
-import components.InputComponent
-import components.TitleComponent
+import components.*
+import components.dialog.ArtDialogComponent
 import csstype.Auto
 import csstype.px
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import mui.material.*
+import mui.material.CircularProgress
+import mui.material.CircularProgressColor
+import mui.material.ImageList
 import mui.system.sx
 import react.*
-import react.dom.html.ReactHTML.div
 import react.dom.html.ReactHTML.hr
-import react.dom.html.ReactHTML.p
 
 val scope = MainScope()
 
@@ -36,40 +32,19 @@ val App = VFC {
     TitleComponent()
     hr()
     //Buttons & Card Counter
-    div {
-        Button {
-            +"Delete"
-            variant = ButtonVariant.contained
-            color = ButtonColor.error
-            onClick = {
-                scope.launch {
-                    deleteFinalizedCards()
-                    deleteArtCards()
-                    setArtList(emptyList())
-                    setDeckList(emptyList())
-                }
-            }
-        }
-        Button {
-            +"Download"
-            variant = ButtonVariant.contained
-            color = ButtonColor.primary
-            onClick = {
-                scope.launch {
-                    zipFiles(deckList)
-                }
-            }
-        }
-        p {
-            +"cards: ${deckList.size}"
-        }
+    CardButtons {
+        this.deckList = deckList
+        this.setDeckList = setDeckList
+        this.setArtList = setArtList
+    }
+    CardCounter {
+        this.cardCount = deckList.size
     }
     //Loader
     CircularProgress {
         color = CircularProgressColor.secondary
         className = isLoading.sneaky()
     }
-
     //Selected Cards
     ImageList {
         sx {
