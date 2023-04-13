@@ -3,6 +3,11 @@ body {
     font-family: sans-serif
 }
 
+.cardimg {
+    width: 182px;
+    height: 261px;
+}
+
 li:hover > .cardimg {
     opacity: .9
 }
