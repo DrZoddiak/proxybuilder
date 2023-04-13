@@ -3,6 +3,7 @@ package components.dialog
 import ArtCard
 import FinalizedCard
 import api.card.FinalizedCardAPI
+import api.card.FinalizedCardAPI.replaceCard
 import csstype.ClassName
 import kotlinx.coroutines.launch
 import mui.material.ImageListItem
@@ -16,7 +17,7 @@ import scope
 
 external interface DialogChildrenProps : Props {
     var artList: List<ArtCard>
-    var setDeckList: StateSetter<List<FinalizedCard>>
+    var setCard: StateSetter<FinalizedCard?>
     var setDialogIsOpen: StateSetter<Boolean>
 }
 
@@ -32,10 +33,10 @@ val DialogChildren = FC<DialogChildrenProps> { props ->
                 loading = ImgLoading.lazy
                 onClick = {
                     scope.launch {
-                        val oldCard = FinalizedCardAPI.getFinalizedCardList().find { it.name == card.name }
-                        oldCard?.let { old -> FinalizedCardAPI.replaceFinalizedCard(old, card) }
+                        val oldCard = FinalizedCardAPI.getFinalCards().find { it.name == card.name }
+                        oldCard?.let { old -> replaceCard(old, card) }
                         props.setDialogIsOpen(false)
-                        props.setDeckList(FinalizedCardAPI.getFinalizedCardList())
+                        props.setCard(card.asFinalizedCard())
                     }
                 }
             }

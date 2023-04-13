@@ -21,7 +21,7 @@ object ArtCardAPI {
             val imageUris = it.imageUris
             val normal = imageUris?.normal ?: error("We can't process this image")
             ArtCard(
-                it.id, it.name, normal, 2
+                it.id, it.name, normal
             )
         }
 

@@ -1,9 +1,8 @@
 package components
 
-import ArtCard
-import FinalizedCard
 import api.card.ArtCardAPI
 import api.card.FinalizedCardAPI
+import api.card.FinalizedCardAPI.getFinalCards
 import api.library.DownloadAPI
 import kotlinx.coroutines.launch
 import mui.material.Button
@@ -17,18 +16,15 @@ import react.dom.events.MouseEventHandler
 import scope
 
 external interface CardButtonProps : Props {
-    var deckList: List<FinalizedCard>
-    var setDeckList: StateSetter<List<FinalizedCard>>
-    var setArtList: StateSetter<List<ArtCard>>
+    var searchSetter: StateSetter<List<String>>
 }
 
 val CardButtons = FC<CardButtonProps> { props ->
     val deleteHandler: MouseEventHandler<HTMLButtonElement> = {
         scope.launch {
-            FinalizedCardAPI.deleteFinalizedCards()
+            FinalizedCardAPI.removeCards()
             ArtCardAPI.deleteArtCards()
-            props.setArtList(emptyList())
-            props.setDeckList(emptyList())
+            props.searchSetter(emptyList())
         }
     }
     Button {
@@ -43,7 +39,17 @@ val CardButtons = FC<CardButtonProps> { props ->
         color = ButtonColor.primary
         onClick = {
             scope.launch {
-                DownloadAPI.zipFiles(props.deckList)
+                DownloadAPI.zipFiles(getFinalCards())
+            }
+        }
+    }
+    Button {
+        +"Save"
+        variant = ButtonVariant.contained
+        color = ButtonColor.info
+        onClick = {
+            scope.launch {
+
             }
         }
     }

@@ -79,6 +79,7 @@ kotlin {
 
                 implementation(npm("jszip", "3.10.1"))
                 implementation(npm("file-saver", "2.0.5"))
+                implementation(npm("react-progressive-graceful-image","0.7.0"))
             }
         }
     }

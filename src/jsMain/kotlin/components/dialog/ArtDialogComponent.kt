@@ -17,7 +17,7 @@ external interface ArtDialogProps : Props {
     var modalIsOpen: Boolean
     var artList : List<ArtCard>
     var setIsOpen: StateSetter<Boolean>
-    var setDeckList: StateSetter<List<FinalizedCard>>
+    var setCard : StateSetter<FinalizedCard?>
 }
 
 val ArtDialogComponent = FC<ArtDialogProps> { props ->
@@ -42,8 +42,8 @@ val ArtDialogComponent = FC<ArtDialogProps> { props ->
             cols = 3
             rowHeight = 261
             children = DialogChildren.create {
+                this.setCard = props.setCard
                 this.artList = props.artList
-                this.setDeckList = props.setDeckList
                 this.setDialogIsOpen = props.setIsOpen
             }
         }

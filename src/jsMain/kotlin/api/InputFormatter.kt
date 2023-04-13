@@ -9,4 +9,10 @@ object InputFormatter {
         return input.filterNot { it.isDigit() }.trim()
     }
 
+    fun formatSearch(input: String): List<String> {
+        return input.split("\n")
+            .filterNot { it.isEmpty() }
+            .map { removeNumbers(it) }
+    }
+
 }

@@ -13,7 +13,6 @@ object CardLookupAPI {
     }
 
     suspend fun singleCardLookup(input: String): List<CardData>? {
-        val card = Api.scryfallApi.namedCardLookup(input)
-        return card?.printsSearchUri?.let { Api.scryfallApi.artLookup(it) }?.data
+        return Api.scryfallApi.namedCardLookup(input)?.printsSearchUri?.let { Api.scryfallApi.artLookup(it) }?.data
     }
 }

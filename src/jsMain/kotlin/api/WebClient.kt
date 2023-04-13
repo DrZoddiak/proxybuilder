@@ -1,7 +1,6 @@
 package api
 
 import ArtCard
-import Card
 import FinalizedCard
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -39,7 +38,7 @@ object WebClient {
         }
     }
 
-    internal suspend inline fun <reified T : Card> addCard(card: T): HttpResponse {
+    internal suspend inline fun addCard(card: FinalizedCard): HttpResponse {
         return jsonClient.post(card.staticPath) {
             contentType(ContentType.Application.Json)
             setBody(card)

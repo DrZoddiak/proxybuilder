@@ -2,44 +2,42 @@ package api.card
 
 import ArtCard
 import FinalizedCard
-import api.Api
-import api.WebClient.addCard
-import api.WebClient.cardList
-import api.WebClient.deleteCards
-import api.WebClient.replaceCard
+import api.Api.scryfallApi
 import api.card.CardLookupAPI.cardLookup
 
 object FinalizedCardAPI {
-    suspend fun getFinalizedCardList(): List<FinalizedCard> {
-        return cardList(FinalizedCard.path)
+    private val finalizedCards = mutableListOf<FinalizedCard>()
+
+    fun addCard(card: FinalizedCard): FinalizedCard {
+        finalizedCards.add(card)
+        return card
     }
 
-    suspend fun addFinalizedCard(finalizedCard: FinalizedCard) {
-        addCard(finalizedCard)
+    fun removeCard(card: FinalizedCard): Boolean {
+        return finalizedCards.remove(card)
     }
 
-    suspend fun replaceFinalizedCard(card: FinalizedCard, artCard: ArtCard) {
-        replaceCard(card, artCard)
+    fun removeCards() = finalizedCards.clear()
+
+    fun replaceCard(card: FinalizedCard, updated: ArtCard) {
+        val index = finalizedCards.indexOf(card)
+        finalizedCards.removeAt(index)
+        finalizedCards[index] = updated.asFinalizedCard()
     }
 
-    suspend fun deleteFinalizedCards() {
-        deleteCards(FinalizedCard.path)
+    fun getFinalCards(): MutableList<FinalizedCard> {
+        return finalizedCards
     }
 
-    suspend fun deleteFinalizedCard(finalizedCard: FinalizedCard) {
-        deleteCards(FinalizedCard.path + "/${finalizedCard.id}")
-    }
+    suspend fun finalizedCards(input: String) {
+        cardLookup(input).forEach {
+            val lookup = scryfallApi.namedCardLookup(input) ?: error("We can't process this image")
+            val normal = lookup.imageUris?.normal ?: error("We can't process this image")
 
-    suspend fun finalizedCards(input: String): List<FinalizedCard> {
-        return cardLookup(input).map {
-            val cat =
-                "https://excitedcats.com/wp-content/uploads/2020/06/brown-tabby_shutterstock_-gillmar-scaled.jpg"
-            val normal = it.imageUris?.normal ?: cat
             FinalizedCard(
-                it.id,
-                it.name,
-                normal,
-                Api.scryfallApi.artLookup(it.printsSearchUri).totalCards
+                lookup.id,
+                lookup.name,
+                normal
             )
         }
     }
