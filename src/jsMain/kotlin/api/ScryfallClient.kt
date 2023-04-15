@@ -20,7 +20,7 @@ class ScryfallClient(private val client: HttpClient, private val url: String = "
     private suspend fun fetchNamed(input: String): HttpResponse {
         return fetch("$url/named") {
             url {
-                parameters.append("exact", input)
+                parameters.append("fuzzy", input)
             }
         }
     }
