@@ -16,28 +16,26 @@ import react.key
 import scope
 
 external interface DialogChildrenProps : Props {
-    var artList: List<ArtCard>
+    var artCard: ArtCard
     var setCard: StateSetter<FinalizedCard?>
     var setDialogIsOpen: StateSetter<Boolean>
 }
 
 val DialogChildren = FC<DialogChildrenProps> { props ->
-    props.artList.map { card ->
-        ImageListItem {
-            key = card.imageUri
-            img {
-                className = ClassName("cardimg")
-                src = "${card.imageUri}?&auto=format"
-                srcSet = "${card.imageUri}?&auto=format&dpr=2 2x"
-                alt = card.name
-                loading = ImgLoading.lazy
-                onClick = {
-                    scope.launch {
-                        val oldCard = FinalizedCardAPI.getFinalCards().find { it.name == card.name }
-                        oldCard?.let { old -> replaceCard(old, card) }
-                        props.setDialogIsOpen(false)
-                        props.setCard(card.asFinalizedCard())
-                    }
+    ImageListItem {
+        key = props.artCard.imageUri
+        img {
+            className = ClassName("cardimg")
+            src = "${props.artCard.imageUri}?&auto=format"
+            srcSet = "${props.artCard.imageUri}?&auto=format&dpr=2 2x"
+            alt = props.artCard.name
+            loading = ImgLoading.lazy
+            onClick = {
+                scope.launch {
+                    val oldCard = FinalizedCardAPI.getFinalCards().find { it.name == props.artCard.name }
+                    oldCard?.let { old -> replaceCard(old, props.artCard) }
+                    props.setDialogIsOpen(false)
+                    props.setCard(props.artCard.asFinalizedCard())
                 }
             }
         }

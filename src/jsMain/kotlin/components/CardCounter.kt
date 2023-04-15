@@ -5,10 +5,10 @@ import react.Props
 import react.dom.html.ReactHTML.p
 
 external interface CounterProps : Props {
-    var cardCount : Int
+    var cardCount: Int
 }
 
-val CardCounter = FC<CounterProps>  { props ->
+val CardCounter = FC<CounterProps> { props ->
 
     p {
         +"cards: ${props.cardCount}"

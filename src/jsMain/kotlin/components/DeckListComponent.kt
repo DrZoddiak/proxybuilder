@@ -3,7 +3,7 @@ package components
 import ArtCard
 import FinalizedCard
 import api.Api
-import api.card.ArtCardAPI.loadArtCards
+import api.card.ArtCardAPI.loadCards
 import api.card.FinalizedCardAPI
 import api.card.FinalizedCardAPI.addCard
 import components.dialog.ArtDialogComponent
@@ -35,66 +35,69 @@ val DeckListComponent = FC<DeckListProps> { props ->
     useEffectOnce {
         scope.launch {
             val search = async {
-                val cardData = Api.scryfallApi.namedCardLookup(props.cardName) ?: error("Dun fucekd up")
-                val finalCard = FinalizedCard(
-                    cardData.id,
-                    cardData.name,
-                    cardData.imageUris!!.normal
-                )
-                artCards = loadArtCards(finalCard)
-                addCard(finalCard)
-                finalCard
+                val cardData = Api.scryfallApi.namedCardLookup(props.cardName)
+                    ?: error("Cannot find card by name - ${props.cardName}")
+                cardData.imageUris?.normal?.let {
+                    val finalCard = FinalizedCard(
+                        cardData.id,
+                        cardData.name,
+                        cardData.imageUris.normal
+                    )
+                    artCards = loadCards(finalCard)
+                    addCard(finalCard)
+                    finalCard
+                }
             }
             setCard(search.await())
         }
     }
-    ImageListItem {
-        val skeleton = Skeleton.create {
-            variant = SkeletonVariant.rectangular
-            width = 182.px
-            height = 261.px
-        }
-        if (card == null) skeleton.asElementOrNull()
+    val skeleton = Skeleton.create {
+        variant = SkeletonVariant.rectangular
+        width = 182.px
+        height = 261.px
+    }
+    if (card == null) skeleton.asElementOrNull()
+    else {
+        ImageListItem {
+            key = card.name
 
-        key = card?.name
-
-        ProgressiveImage {
-            src = "${card?.imageUri}?w=182&h=261&auto=format"
-            placeholder = ""
-            key = card.toString()
-            children = { s, l, d ->
-                if (!l) {
-                    img.create {
-                        className = ClassName("cardimg")
-                        src = "$s?w=182&h=261&auto=format"
-                        alt = card?.name
-                        loading = ImgLoading.eager
-                        onClick = {
-                            setIsOpen(true)
-                        }
-                        onAuxClick = {
-                            scope.launch {
-                                card?.let { FinalizedCardAPI.removeCard(it) }
-                                val search = props.searchList.filterNot { it == card?.name }
-                                props.setSearchList(search)
+            ProgressiveImage {
+                src = "${card.imageUri}?w=182&h=261&auto=format"
+                placeholder = ""
+                children = { image, load, _ ->
+                    if (!load) {
+                        img.create {
+                            className = ClassName("cardimg")
+                            src = "$image?w=182&h=261&auto=format"
+                            alt = card.name
+                            loading = ImgLoading.eager
+                            onClick = {
+                                setIsOpen(true)
+                            }
+                            onAuxClick = {
+                                scope.launch {
+                                    FinalizedCardAPI.removeCard(card)
+                                    val search = props.searchList.filterNot { it == card.name }
+                                    props.setSearchList(search)
+                                }
                             }
                         }
+                    } else {
+                        skeleton
                     }
-                } else {
-                    skeleton
+                }
+            }
+            ImageListItemBar {
+                title = Fragment.create {
+                    +props.cardName
                 }
             }
         }
-        ImageListItemBar {
-            title = Fragment.create {
-                +props.cardName
-            }
+        ArtDialogComponent {
+            this.setCard = setCard
+            this.artList = artCards
+            this.modalIsOpen = isOpen
+            this.setIsOpen = setIsOpen
         }
-    }
-    ArtDialogComponent {
-        this.setCard = setCard
-        this.artList = artCards
-        this.modalIsOpen = isOpen
-        this.setIsOpen = setIsOpen
     }
 }

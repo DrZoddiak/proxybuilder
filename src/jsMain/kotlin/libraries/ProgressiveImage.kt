@@ -26,7 +26,7 @@ sealed external interface ProgressiveImageProps : Props {
     var noLazyLoad: Boolean?
     var rootMargin: String?
     var threshold: dynamic //Number | Array<Number>
-    var children: ((src: String, loading: Boolean, srcSetData: SrcSetData?) -> ReactNode)?
+    var children: ((src: String?, loading: Boolean, srcSetData: SrcSetData?) -> ReactNode)?
 }
 
 @JsName("default")

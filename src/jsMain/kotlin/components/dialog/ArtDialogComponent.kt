@@ -8,16 +8,13 @@ import mui.material.Dialog
 import mui.material.DialogTitle
 import mui.material.ImageList
 import mui.system.sx
-import react.FC
-import react.Props
-import react.StateSetter
-import react.create
+import react.*
 
 external interface ArtDialogProps : Props {
     var modalIsOpen: Boolean
-    var artList : List<ArtCard>
+    var artList: List<ArtCard>
     var setIsOpen: StateSetter<Boolean>
-    var setCard : StateSetter<FinalizedCard?>
+    var setCard: StateSetter<FinalizedCard?>
 }
 
 val ArtDialogComponent = FC<ArtDialogProps> { props ->
@@ -41,10 +38,15 @@ val ArtDialogComponent = FC<ArtDialogProps> { props ->
             }
             cols = 3
             rowHeight = 261
-            children = DialogChildren.create {
-                this.setCard = props.setCard
-                this.artList = props.artList
-                this.setDialogIsOpen = props.setIsOpen
+            children = Fragment.create {
+                props.artList.map { art ->
+                    DialogChildren {
+                        key = art.toString()
+                        this.artCard = art
+                        this.setCard = props.setCard
+                        this.setDialogIsOpen = props.setIsOpen
+                    }
+                }
             }
         }
     }

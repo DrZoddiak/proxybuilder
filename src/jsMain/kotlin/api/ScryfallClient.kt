@@ -34,6 +34,7 @@ class ScryfallClient(private val client: HttpClient, private val url: String = "
     }
 
     suspend fun artLookup(input: String): BaseResponse {
+        delay(delayTime)
         return client.get(input).body()
     }
 

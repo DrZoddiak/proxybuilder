@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 data class FinalizedCard(
     override val cardId: String,
     override val name: String,
-    override var imageUri: String,
+    override var imageUri: String?,
 ) : Card {
     val id: Int = cardId.hashCode()
 
@@ -20,7 +20,7 @@ data class FinalizedCard(
 data class ArtCard(
     override val cardId: String,
     override val name: String,
-    override var imageUri: String,
+    override var imageUri: String?,
 ) : Card {
 
     fun asFinalizedCard(): FinalizedCard {
@@ -31,5 +31,5 @@ data class ArtCard(
 interface Card {
     val cardId: String
     val name: String
-    var imageUri: String
+    var imageUri: String?
 }

@@ -18,9 +18,11 @@ object DownloadAPI {
         val zip = JSZip()
         val img = zip.folder(imageFolder)
         list.forEach { card ->
-            fetch(card.imageUri).then {
-                img?.file("${card.name}$imageExtension", it.blob())
-            }.await()
+            card.imageUri?.let {
+                fetch(it).then {
+                    img?.file("${card.name}$imageExtension", it.blob())
+                }.await()
+            }
         }
         zip.generateAsync(generatorOptions(generatorOption)).then { blob ->
             FileSaver(blob, fileName)

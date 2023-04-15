@@ -3,7 +3,7 @@ package api.card
 import ArtCard
 import FinalizedCard
 import api.Api.scryfallApi
-import api.card.CardLookupAPI.cardLookup
+import api.card.CardLookupAPI.standardCard
 
 object FinalizedCardAPI {
     private val finalizedCards = mutableListOf<FinalizedCard>()
@@ -30,7 +30,7 @@ object FinalizedCardAPI {
     }
 
     suspend fun finalizedCards(input: String) {
-        cardLookup(input).forEach {
+        standardCard(input).forEach {
             val lookup = scryfallApi.namedCardLookup(input) ?: error("We can't process this image")
             val normal = lookup.imageUris?.normal ?: error("We can't process this image")
 

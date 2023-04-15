@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 
 package libraries
 
@@ -22,7 +22,7 @@ import kotlin.js.*
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 @JsModule("jszip")
 @JsNonModule
-external interface JSZip {
+sealed external interface JSZip {
     companion object
 
     fun file(path: String, data: Promise<Any>): JSZip /* this */
@@ -34,22 +34,21 @@ external interface JSZip {
 
 }
 
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-inline operator fun JSZip.Companion.invoke(): JSZip = js("JSZip()") as JSZip
-
-external interface JSZipMetadata {
+sealed external interface JSZipMetadata {
     var percent: Number
     var currentFile: String?
 }
 
-external interface JSZipGeneratorOptions {
+sealed external interface JSZipGeneratorOptions {
     var type: String?
         get() = definedExternally
         set(value) = definedExternally
 }
 
+inline operator fun JSZip.Companion.invoke(): JSZip = js("JSZip()") as JSZip
+
 fun generatorOptions(type: String? = ""): JSZipGeneratorOptions {
     val o = js("({})")
     o["type"] = type
-    return o
+    return o as JSZipGeneratorOptions
 }

@@ -23,10 +23,11 @@ val CardButtons = FC<CardButtonProps> { props ->
     val deleteHandler: MouseEventHandler<HTMLButtonElement> = {
         scope.launch {
             FinalizedCardAPI.removeCards()
-            ArtCardAPI.deleteArtCards()
+            ArtCardAPI.clear()
             props.searchSetter(emptyList())
         }
     }
+
     Button {
         +"Delete"
         variant = ButtonVariant.contained
@@ -40,16 +41,6 @@ val CardButtons = FC<CardButtonProps> { props ->
         onClick = {
             scope.launch {
                 DownloadAPI.zipFiles(getFinalCards())
-            }
-        }
-    }
-    Button {
-        +"Save"
-        variant = ButtonVariant.contained
-        color = ButtonColor.info
-        onClick = {
-            scope.launch {
-
             }
         }
     }

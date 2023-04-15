@@ -2,26 +2,25 @@ package api.card
 
 import ArtCard
 import FinalizedCard
-import api.card.CardLookupAPI.singleCardLookup
 
 object ArtCardAPI {
     private val artCards = mutableMapOf<FinalizedCard, List<ArtCard>>()
 
-    fun deleteArtCards() {
+    fun clear() {
         artCards.clear()
     }
 
-    suspend fun loadArtCards(card: FinalizedCard): List<ArtCard> {
-        return artCards.getOrPut(card) { this.artCards(card.name) ?: error("Whoops") }
+    suspend fun loadCards(card: FinalizedCard): List<ArtCard> {
+        return artCards.getOrPut(card) { this.artCards(card.name) ?: error("Error loading image") }
     }
 
     private suspend fun artCards(card: String): List<ArtCard>? {
-        //produce Art Card
-        val artCards = singleCardLookup(card)?.map {
-            val imageUris = it.imageUris
-            val normal = imageUris?.normal ?: error("We can't process this image")
+        val artCards = CardLookupAPI.artCards(card)?.map {
+            //TODO: Process images with special faces
+            //Image may not process because it has multiple faces
+            val image = it.imageUris?.normal ?: error("We can't process this image")
             ArtCard(
-                it.id, it.name, normal
+                it.id, it.name, image
             )
         }
 
