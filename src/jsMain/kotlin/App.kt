@@ -1,4 +1,5 @@
 import api.InputFormatter
+import api.addAllOf
 import components.*
 import csstype.Auto
 import csstype.px
@@ -50,7 +51,12 @@ val App = VFC {
     InputComponent {
         onSubmit = { input ->
             scope.launch {
-                setSearchList(InputFormatter.formatSearch(input))
+                val formatted = InputFormatter.formatSearch(input)
+                val searches = mutableListOf<String>()
+                    .addAllOf(searchList, formatted)
+                    .distinct()
+
+                setSearchList(searches)
             }
         }
     }
