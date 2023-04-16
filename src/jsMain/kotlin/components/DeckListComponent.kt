@@ -38,11 +38,7 @@ val DeckListComponent = FC<DeckListProps> { props ->
                 val cardData = Api.scryfallApi.namedCardLookup(props.cardName)
                     ?: error("Cannot find card by name - ${props.cardName}")
                 cardData.imageUris?.normal?.let {
-                    val finalCard = FinalizedCard(
-                        cardData.id,
-                        cardData.name,
-                        cardData.imageUris.normal
-                    )
+                    val finalCard = FinalizedCard(cardData.id, cardData.name, it)
                     artCards = loadCards(finalCard)
                     addCard(finalCard)
                     finalCard
