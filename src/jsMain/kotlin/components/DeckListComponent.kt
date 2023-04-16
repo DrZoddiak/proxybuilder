@@ -27,7 +27,7 @@ external interface DeckListProps : Props {
     var setSearchList: StateSetter<List<String>>
 }
 
-val DeckListComponent = FC<DeckListProps> { props ->
+internal val DeckListComponent = FC<DeckListProps> { props ->
     var artCards by useState(emptyList<ArtCard>())
     val (card, setCard) = useState<FinalizedCard>()
     val (isOpen, setIsOpen) = useState(false)

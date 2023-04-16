@@ -9,7 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 
-class ScryfallClient(private val client: HttpClient, private val url: String = "https://api.scryfall.com/cards") {
+internal class ScryfallClient(private val client: HttpClient, private val url: String = "https://api.scryfall.com/cards") {
     private val delayTime = 50L //Suggested delay by api
 
     private suspend fun fetch(urlString: String, block: HttpRequestBuilder.() -> Unit): HttpResponse {

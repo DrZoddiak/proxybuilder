@@ -19,7 +19,7 @@ external interface CardButtonProps : Props {
     var searchSetter: StateSetter<List<String>>
 }
 
-val CardButtons = FC<CardButtonProps> { props ->
+internal val CardButtons = FC<CardButtonProps> { props ->
     val deleteHandler: MouseEventHandler<HTMLButtonElement> = {
         scope.launch {
             FinalizedCardAPI.removeCards()

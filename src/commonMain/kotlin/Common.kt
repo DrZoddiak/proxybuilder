@@ -28,7 +28,7 @@ data class ArtCard(
     }
 }
 
-interface Card {
+private interface Card {
     val cardId: String
     val name: String
     var imageUri: String?

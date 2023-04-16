@@ -1,6 +1,6 @@
 package api
 
-fun <T> MutableList<T>.addAllOf(vararg elements: Collection<T>): List<T> {
+internal fun <T> MutableList<T>.addAllOf(vararg elements: Collection<T>): List<T> {
     elements.forEach {
         this.addAll(it)
     }

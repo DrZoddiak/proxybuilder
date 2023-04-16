@@ -8,8 +8,7 @@ external interface CounterProps : Props {
     var cardCount: Int
 }
 
-val CardCounter = FC<CounterProps> { props ->
-
+internal val CardCounter = FC<CounterProps> { props ->
     p {
         +"cards: ${props.cardCount}"
     }

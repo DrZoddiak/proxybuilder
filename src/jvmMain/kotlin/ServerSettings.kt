@@ -1,4 +1,4 @@
-object ServerSettings {
+internal object ServerSettings {
     private const val defaultPort = 9090
 
     internal val mongoUri = "MONGODB_URI".getEnv()

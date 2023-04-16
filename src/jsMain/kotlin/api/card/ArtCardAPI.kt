@@ -3,7 +3,7 @@ package api.card
 import ArtCard
 import FinalizedCard
 
-object ArtCardAPI {
+internal object ArtCardAPI {
     private val artCards = mutableMapOf<FinalizedCard, List<ArtCard>>()
 
     fun clear() {

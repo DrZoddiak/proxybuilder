@@ -12,7 +12,7 @@ import react.dom.html.ReactHTML.hr
 
 val scope = MainScope()
 
-val App = VFC {
+internal val App = VFC {
     val (searchList, setSearchList) = useState(emptyList<String>())
 
     TitleComponent()

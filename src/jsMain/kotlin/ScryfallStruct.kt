@@ -3,14 +3,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BaseResponse(
+internal data class BaseResponse(
     @SerialName("total_cards")
     val totalCards : Int,
     val data: List<CardData>
 )
 
 @Serializable
-data class ImageTypes(
+internal data class ImageTypes(
     val png: String,
     @SerialName("border_crop")
     val borderCrop : String,
@@ -24,7 +24,7 @@ data class ImageTypes(
 }
 
 @Serializable
-data class CardData(
+internal data class CardData(
     val id: String,
     val name: String,
     @SerialName("image_uris")

@@ -4,7 +4,7 @@ import CardData
 import api.Api
 import api.InputFormatter
 
-object CardLookupAPI {
+internal object CardLookupAPI {
     suspend fun standardCard(input: String): List<CardData> {
         return InputFormatter.formatSearch(input).mapNotNull { Api.scryfallApi.namedCardLookup(it) }
     }

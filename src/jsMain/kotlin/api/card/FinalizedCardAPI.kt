@@ -5,7 +5,7 @@ import FinalizedCard
 import api.Api.scryfallApi
 import api.card.CardLookupAPI.standardCard
 
-object FinalizedCardAPI {
+internal object FinalizedCardAPI {
     private val finalizedCards = mutableListOf<FinalizedCard>()
 
     fun addCard(card: FinalizedCard): FinalizedCard {

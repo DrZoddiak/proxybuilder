@@ -2,7 +2,7 @@ package api
 
 import api.WebClient.jsonClient
 
-object Api {
+internal object Api {
     val scryfallApi by lazy {
         ScryfallClient(jsonClient)
     }

@@ -17,7 +17,7 @@ external interface ArtDialogProps : Props {
     var setCard: StateSetter<FinalizedCard?>
 }
 
-val ArtDialogComponent = FC<ArtDialogProps> { props ->
+internal val ArtDialogComponent = FC<ArtDialogProps> { props ->
 
     Dialog {
         maxWidth = "md"

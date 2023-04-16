@@ -1,6 +1,6 @@
 package api
 
-object InputFormatter {
+internal object InputFormatter {
     private fun removeNumbers(input: String): String {
         return input.filterNot { it.isDigit() }.trim()
     }

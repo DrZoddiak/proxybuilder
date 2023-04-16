@@ -45,7 +45,7 @@ sealed external interface JSZipGeneratorOptions {
         set(value) = definedExternally
 }
 
-inline operator fun JSZip.Companion.invoke(): JSZip = js("JSZip()") as JSZip
+internal inline operator fun JSZip.Companion.invoke(): JSZip = js("JSZip()") as JSZip
 
 fun generatorOptions(type: String? = ""): JSZipGeneratorOptions {
     val o = js("({})")

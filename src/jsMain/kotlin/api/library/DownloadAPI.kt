@@ -8,7 +8,7 @@ import libraries.JSZip
 import libraries.generatorOptions
 import libraries.invoke
 
-object DownloadAPI {
+internal object DownloadAPI {
     private const val fileName = "proxy.zip"
     private const val imageExtension = ".png"
     private const val imageFolder = "images"

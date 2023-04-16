@@ -21,7 +21,7 @@ external interface DialogChildrenProps : Props {
     var setDialogIsOpen: StateSetter<Boolean>
 }
 
-val DialogChildren = FC<DialogChildrenProps> { props ->
+internal val DialogChildren = FC<DialogChildrenProps> { props ->
     ImageListItem {
         key = props.artCard.imageUri
         img {

@@ -17,7 +17,7 @@ external interface InputProps : Props {
     var onSubmit: (String) -> Unit
 }
 
-val InputComponent = FC<InputProps> { props ->
+internal val InputComponent = FC<InputProps> { props ->
     val (text, setText) = useState("")
 
     val submitHandler: FormEventHandler<HTMLFormElement> = {
